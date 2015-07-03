@@ -1,0 +1,30 @@
+{
+  "version": "string",
+  "session": {
+    "new": true,
+    "sessionId": "string",
+    "application": {
+      "applicationId": "string"
+    },
+    "attributes": {
+    },
+    "user": {
+      "userId": "string"
+    }
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "string",
+    "timestamp": "2015-05-13T12:34:56Z",
+    "intent": {
+      "name": "Foo",
+      "slots": {
+        "string": {
+          "name": "string",
+          "value": "string"
+        }
+      }
+    }
+  }
+}
+
