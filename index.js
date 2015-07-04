@@ -58,6 +58,24 @@ Response.prototype._response = function(args) {
 
 
 /**
+ * Special wrapper for a slot() handler
+ */
+function SlotHandler(slotName, handler) {
+    this.slotName = slotName;
+    this.handler = handler;
+
+    this.length = handler.length;
+}
+
+SlotHandler.prototype.call = function(_, req, res, next) {
+    var value = req.slot(this.slotName);
+    if (!value) return next(); // nothing to do
+
+    this.handler.call(this.handler, req, res, next, value);
+}
+
+
+/**
  * @return a `function(req, res)` that applies the
  *  whole chain of middleware befor efinally calling
  *  the finalHandler
@@ -123,6 +141,14 @@ Expressive.prototype.handle = function(exports) {
             }
         };
 
+        event.slot = function(key) {
+            var intent = event.request.intent;
+            if (intent) {
+                var entry = intent.slots[key];
+                if (entry) return entry.value;
+            }
+        }
+
         // start session handler
         try {
             if (event.session.new) {
@@ -157,6 +183,24 @@ Expressive.prototype.intent = function(intentName, handler) {
 Expressive.prototype.launch = function(handler) {
     this._onLaunch = handler;
 }
+
+/**
+ * Install a middleware to handle an intent slot,
+ *  like app.param() in Express.
+ * @param handler A `function(req, res, next, slotValue)`
+ */
+Expressive.prototype.slot = function(slotName, handler) {
+    var self = this;
+    if (Array.isArray(slotName)) {
+        slotName.forEach(function(name) {
+            self.slot(name, handler);
+        });
+        return;
+    }
+
+    this._mid().push(new SlotHandler(slotName, handler));
+}
+
 
 /**
  * Install the handler for when a new Session starts

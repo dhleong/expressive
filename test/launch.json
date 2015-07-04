@@ -1,7 +1,7 @@
 {
   "version": "string",
   "session": {
-    "new": false,
+    "new": true,
     "sessionId": "string",
     "application": {
       "applicationId": "string"

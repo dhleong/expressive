@@ -22,6 +22,10 @@
         "string": {
           "name": "string",
           "value": "string"
+        },
+        "username": {
+          "name": "username",
+          "value": "myUsername"
         }
       }
     }

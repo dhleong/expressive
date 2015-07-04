@@ -19,6 +19,11 @@ beforeEach(function() {
         next();
     });
 
+    this.app.slot('username', function(req, res, next, id) {
+        req.attr('got-username', id);
+        next();
+    });
+
     this.app.end(function(req) {
         req.attr('Ended', true);
     });
@@ -34,7 +39,6 @@ beforeEach(function() {
     this.app.start(function(req) {
         req.attr('StartSession', true);
     });
-
 
     this.dispatch = dispatch.bind(dispatch, this.app);
 });
@@ -66,4 +70,12 @@ describe("Global middleware and routing", function() {
         res.should.have.attr('Ended', true);
     });
 
+});
+
+describe("Slot Handler", function() {
+    itWithJson(fooJson, "is called on Foo Intent", function(err, res) {
+        expect(err).to.not.be.errorLike
+
+        res.should.have.attr('got-username', 'myUsername');
+    });
 });
