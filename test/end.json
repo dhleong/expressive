@@ -13,8 +13,9 @@
     }
   },
   "request": {
-    "type": "LaunchRequest",
+    "type": "SessionEndedRequest",
     "requestId": "string",
-    "timestamp": "2015-05-13T12:34:56Z"
+    "timestamp": "2015-05-13T12:34:56Z",
+    "reason": "string"
   }
 }

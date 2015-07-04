@@ -114,7 +114,7 @@ Expressive.prototype.handle = function(exports) {
             return;
         }
 
-        // install a convenience
+        // install conveniences
         event.attr = function(key, val) {
             if (val === undefined) {
                 return event.session.attributes[key];
@@ -123,13 +123,25 @@ Expressive.prototype.handle = function(exports) {
             }
         };
 
+        // start session handler
         try {
+            if (event.session.new) {
+                self._onSessionStartedRequest.call(self, event);
+            }
+
             myHandler.call(self, event, new Response(event.session, context));
         } catch (e) {
             console.error("Error handling", event, e);
             context.fail(e);
         }
     };
+}
+
+/**
+ * Install the handler for when a Session ends
+ */
+Expressive.prototype.end = function(handler) {
+    this._onEndSession = handler;
 }
 
 /**
@@ -144,6 +156,13 @@ Expressive.prototype.intent = function(intentName, handler) {
  */
 Expressive.prototype.launch = function(handler) {
     this._onLaunch = handler;
+}
+
+/**
+ * Install the handler for when a new Session starts
+ */
+Expressive.prototype.start = function(handler) {
+    this._onStartSession = handler;
 }
 
 /**
@@ -183,6 +202,33 @@ Expressive.prototype._onIntentRequest = function(req, res) {
     chain(req, res);
 }
 
+Expressive.prototype._onSessionEndedRequest = function(req, res) {
+    if (!this._onEndSession) {
+        // no end session handler, but that's okay
+        res._succeed({}); // response is unnecessary, but helps testing
+        return;
+    }
+
+    var self = this;
+    var chain = buildRequestChain(this._mid(), function(req, res) {
+        // end session request is special and doesn't
+        //  do any response
+        if (self._onEndSession.length == 1) {
+            // easy
+            self._onEndSession(req);
+            res._succeed({});
+        } else {
+            // fancy (middleware style, or if they do async work)
+            self._onEndSession(req, res._succeed.bind(res, {}));
+        }
+    });
+    chain(req, res);
+}
+
+Expressive.prototype._onSessionStartedRequest = function(req) {
+    var chain = buildRequestChain(this._mid(), this._onStartSession);
+    chain(req); // NB: started doesn't get access to the response
+}
 
 // mimic express
 module.exports = function expressive(appId) {
