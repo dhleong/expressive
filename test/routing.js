@@ -5,6 +5,7 @@ var chai = require('chai')
 
   , expressive = require('../')
   , endJson = require('./end.json')
+  , errJson = require('./err.json')
   , launchJson = require('./launch.json')
   , fooJson = require('./FooIntent.json');
 
@@ -17,6 +18,11 @@ beforeEach(function() {
     this.app.use(function(req, res, next) {
         req.attr('middleware', true);
         next();
+    });
+
+    this.app.slot('error', function(req, res, next, id) {
+        req.attr('error-handler', true);
+        next(new Error("We got an error? " + id));
     });
 
     this.app.slot('username', function(req, res, next, id) {
@@ -68,6 +74,13 @@ describe("Global middleware and routing", function() {
         expect(err).to.not.be.errorLike
         res.should.have.attr('middleware', true);
         res.should.have.attr('Ended', true);
+    });
+
+    itWithJson(errJson, "is stops on error in middleware", function(err, res) {
+        expect(err).to.be.errorLike
+        res.should.have.attr('middleware', true);
+        res.should.have.attr('error-handler', true);
+        res.should.not.tell;
     });
 
 });

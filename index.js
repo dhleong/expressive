@@ -10,6 +10,7 @@ var GLOBAL_MIDDLEWARES = '!_global';
 function Response(session, context) {
     this._session = session;
     this._context = context;
+    this._errored = false;
 }
 
 Response.prototype.tell = function(speechOutput) {
@@ -17,6 +18,12 @@ Response.prototype.tell = function(speechOutput) {
         output: speechOutput,
         shouldEndSession: true
     });
+}
+
+Response.prototype._error = function(err) {
+    // NB: we provide a response fo better testing
+    this._errored = true;
+    this._context.fail(err, this._response({}));
 }
 
 Response.prototype._succeed = function(args) {
@@ -86,7 +93,13 @@ function buildRequestChain(middleware, finalHandler) {
 
     return function(req, res) {
         var next;
-        next = function() {
+        next = function(err) {
+            if (err) {
+                // middleware error; pass through
+                res._error(err);
+                return;
+            }
+
             var current = next._index++;
             if (current >= middleware.length) {
                 return finalHandler(req, res);
@@ -151,14 +164,18 @@ Expressive.prototype.handle = function(exports) {
 
         // start session handler
         try {
+            var res = new Response(event.session, context);
+
             if (event.session.new) {
-                self._onSessionStartedRequest.call(self, event);
+                self._onSessionStartedRequest.call(self, event, res);
+
+                if (res._errored) return;
             }
 
-            myHandler.call(self, event, new Response(event.session, context));
+            myHandler.call(self, event, res);
         } catch (e) {
             console.error("Error handling", event, e);
-            context.fail(e);
+            res._error(e);
         }
     };
 }
@@ -269,9 +286,11 @@ Expressive.prototype._onSessionEndedRequest = function(req, res) {
     chain(req, res);
 }
 
-Expressive.prototype._onSessionStartedRequest = function(req) {
+Expressive.prototype._onSessionStartedRequest = function(req, res) {
+    // started shouldn't get the response, but we need
+    //  it to handle errors in middleware
     var chain = buildRequestChain(this._mid(), this._onStartSession);
-    chain(req); // NB: started doesn't get access to the response
+    chain(req, res);
 }
 
 // mimic express

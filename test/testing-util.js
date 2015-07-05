@@ -18,9 +18,11 @@ Assertion.addMethod('attr', function(key, val) {
 Assertion.addMethod('tell', function(text) {
     var obj = this._obj;
 
+    var propName = 'response.outputSpeech.text';
+
     new Assertion(obj)
         .to.be.an('object')
-        .that.has.deep.property('response.outputSpeech.text', text);
+        .that.has.deep.property(propName, text);
 });
 
 Assertion.addProperty('errorLike', function() {
@@ -45,9 +47,9 @@ Assertion.addProperty('errorLike', function() {
 
 global.dispatch = function(app, req, callback) {
     var context = {
-        fail: function(err) {
+        fail: function(err, resp) {
             setTimeout(function() {
-                callback(err);
+                callback(err, resp);
             }, 0);
         },
 
@@ -69,7 +71,9 @@ global.itWithJson = function(json, description, callback) {
                 callback(err, resp);
                 done();
             } catch (e) {
-                done(e);
+                // go ahead and provide the callback for testing
+                callback(e, resp);
+                done();
             }
         });
     });
