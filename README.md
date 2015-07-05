@@ -8,7 +8,7 @@ inspired by the syntax of [Express.js](http://expressjs.com).
 
 ### Usage
 
-[![NPM](https://nodei.co/npm/echo-expressive.png?mini=true)](https://nodei.co/npm/expressive/)
+[![NPM](https://nodei.co/npm/echo-expressive.png?mini=true)](https://nodei.co/npm/echo-expressive/)
 
 ```javascript
 var expressive = require('echo-expressive');
