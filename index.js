@@ -7,6 +7,9 @@
 
 var GLOBAL_MIDDLEWARES = '!_global';
 
+/**
+ * Response object provided to handlers
+ */
 function Response(session, context) {
     this._session = session;
     this._context = context;
@@ -17,6 +20,34 @@ Response.prototype.tell = function(speechOutput) {
     this._succeed({
         output: speechOutput,
         shouldEndSession: true
+    });
+}
+
+Response.prototype.tellWithCard = function(speechOutput, cardTitle, cardContent) {
+    this._succeed({
+        output: speechOutput,
+        cardTitle: cardTitle,
+        cardContent: cardContent,
+        shouldEndSession: true
+    });
+}
+
+Response.protoype.ask = function(speechOutput, repromptSpeech) {
+    this._succeed({
+        output: speechOutput,
+        reprompt: repromptSpeech,
+        shouldEndSession: false
+    });
+}
+
+Response.protoype.askWithCard =
+        function(speechOutput, repromptSpeech, cardTitle, cardContent) {
+    this._succeed({
+        output: speechOutput,
+        reprompt: repromptSpeech,
+        cardTitle: cardTitle,
+        cardContent: cardContent,
+        shouldEndSession: false
     });
 }
 
