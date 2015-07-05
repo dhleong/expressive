@@ -32,7 +32,7 @@ Response.prototype.tellWithCard = function(speechOutput, cardTitle, cardContent)
     });
 }
 
-Response.protoype.ask = function(speechOutput, repromptSpeech) {
+Response.prototype.ask = function(speechOutput, repromptSpeech) {
     this._succeed({
         output: speechOutput,
         reprompt: repromptSpeech,
@@ -40,7 +40,7 @@ Response.protoype.ask = function(speechOutput, repromptSpeech) {
     });
 }
 
-Response.protoype.askWithCard =
+Response.prototype.askWithCard =
         function(speechOutput, repromptSpeech, cardTitle, cardContent) {
     this._succeed({
         output: speechOutput,
