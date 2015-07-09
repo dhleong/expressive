@@ -318,6 +318,12 @@ Expressive.prototype._onSessionEndedRequest = function(req, res) {
 }
 
 Expressive.prototype._onSessionStartedRequest = function(req, res) {
+    if (!this._onStartSession) {
+        // no start session handler, but that's okay
+        res._succeed({}); // response is unnecessary, but helps testing
+        return;
+    }
+
     // started shouldn't get the response, but we need
     //  it to handle errors in middleware
     var chain = buildRequestChain(this._mid(), this._onStartSession);
