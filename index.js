@@ -274,7 +274,8 @@ Expressive.prototype.use = function(intentName, handler) {
 }
 
 Expressive.prototype._mid = function(path) {
-    var existing = this._middlewares[path || GLOBAL_MIDDLEWARES];
+    path = path || GLOBAL_MIDDLEWARES;
+    var existing = this._middlewares[path];
     if (existing) return existing;
 
     var newList = [];
@@ -320,7 +321,6 @@ Expressive.prototype._onSessionEndedRequest = function(req, res) {
 Expressive.prototype._onSessionStartedRequest = function(req, res) {
     if (!this._onStartSession) {
         // no start session handler, but that's okay
-        res._succeed({}); // response is unnecessary, but helps testing
         return;
     }
 
