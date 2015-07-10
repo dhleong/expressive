@@ -1,6 +1,6 @@
 {
   "name": "echo-expressive",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A minimalist framework for Alexa Skill Kit apps running on Amazon Lambda",
   "main": "index.js",
   "scripts": {

@@ -181,6 +181,8 @@ Expressive.prototype.handle = function(exports) {
             if (val === undefined) {
                 return event.session.attributes[key];
             } else {
+                if (!event.session) event.session = {};
+                if (!event.session.attributes) event.session.attributes = {};
                 event.session.attributes[key] = val;
             }
         };
