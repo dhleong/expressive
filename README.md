@@ -1,9 +1,10 @@
-Expressive
+Expressive [![Build Status](http://img.shields.io/travis/dhleong/expressive.svg?style=flat)](https://travis-ci.org/dhleong/expressive)
 ==========
 
 A minimalist framework for 
 [Alexa Skills Kit](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit) 
-apps running on [Amazon Lambda](http://aws.amazon.com/lambda),
+apps running on [Amazon Lambda](http://aws.amazon.com/lambda)
+(or as a web service),
 inspired by the syntax of [Express.js](http://expressjs.com).
 
 ### Usage
@@ -75,10 +76,13 @@ app.end(function(req) {
     // this is called when a Session has ended.
     // You can use it to clean up any resources
 });
+
+// install for use on Lambda
+app.handle(module.exports);
+// or, listen like a web service
+app.listen(8080);
 ```
 
 ### Future Work
 
 - Abstract routes further so sets of routes can be mounted like in Express
-- It should be trivial to add a `listen(port)` method so that Expressive
-    apps can also be deployed as regular web apps instead of just Lambda
