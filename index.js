@@ -5,7 +5,34 @@
  *  inspired by the syntax of Express.js
  */
 
-var GLOBAL_MIDDLEWARES = '!_global';
+var http = require('http')
+  , GLOBAL_MIDDLEWARES = '!_global';
+
+/**
+ * Context implementation for when running
+ *  as a web service
+ */
+function WebServiceContext(res) {
+    this._res = res;
+}
+
+WebServiceContext.prototype.fail = function(e, body) {
+    this._write(500, body);
+}
+
+WebServiceContext.prototype.succeed = function(body) {
+    this._write(200, body);
+}
+
+WebServiceContext.prototype._write = function(code, body) {
+    var stringBody = JSON.stringify(body);
+    this._res.writeHead(code, {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Content-Length': stringBody.length
+    });
+    this._res.end(stringBody);
+}
+
 
 /**
  * Response object provided to handlers
@@ -157,7 +184,8 @@ function Expressive(appId) {
 }
 
 /**
- * Install this skill on the main exports
+ * Install this skill on the main exports,
+ *  as when deploying on AWS Lambda
  */
 Expressive.prototype.handle = function(exports) {
     var self = this;
@@ -211,6 +239,41 @@ Expressive.prototype.handle = function(exports) {
             res._error(e);
         }
     };
+}
+
+/** 
+ * Set up your app as a web service.
+ *  The arguments (port, hostname, backlog, callback)
+ *  are identical to Node's http.Server.listen()
+ */
+Expressive.prototype.listen = function() {
+    var wrapped = {};
+    this.handle(wrapped);
+    var handler = wrapped.handler;
+    this.server = http.createServer(function(req, res) {
+        var string = ''
+        req.on('data', function(buffer) {
+            var part = buffer.toString();
+            string += part;
+        });
+
+        req.on('end', function() {
+            try {
+                var json = JSON.parse(string);
+                handler(json, new WebServiceContext(res));
+            } catch (e) {
+                res.writeHead(400);
+                res.end();
+            }
+        });
+    });
+    return this.server.listen.apply(this.server, arguments); 
+}
+
+Expressive.prototype.close = function(callback) {
+    if (!this.server) throw new Error("Not listening");
+    this.server.close(callback);
+    this.server = null;
 }
 
 /**

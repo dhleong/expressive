@@ -1,6 +1,6 @@
 {
   "name": "echo-expressive",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A minimalist framework for Alexa Skill Kit apps running on Amazon Lambda",
   "main": "index.js",
   "scripts": {
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/dhleong/expressive",
   "devDependencies": {
     "chai": "^3.0.0",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "supertest": "^1.0.1"
   }
 }
