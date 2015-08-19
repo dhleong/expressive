@@ -217,7 +217,7 @@ Expressive.prototype.handle = function(exports) {
 
         event.slot = function(key) {
             var intent = event.request.intent;
-            if (intent) {
+            if (intent && intent.slots) {
                 var entry = intent.slots[key];
                 if (entry) return entry.value;
             }

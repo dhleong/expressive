@@ -7,7 +7,8 @@ var chai = require('chai')
   , endJson = require('./end.json')
   , errJson = require('./err.json')
   , launchJson = require('./launch.json')
-  , fooJson = require('./FooIntent.json');
+  , fooJson = require('./FooIntent.json')
+  , noSlotJson = require('./NoSlotIntent.json');
 
 require('./testing-util')
 chai.should();
@@ -40,6 +41,10 @@ beforeEach(function() {
 
     this.app.intent('Foo', function(req, res) {
         res.tell("Foo");
+    });
+
+    this.app.intent('NoSlot', function(req, res) {
+        res.tell("NoSlot");
     });
 
     this.app.start(function(req) {
@@ -90,5 +95,11 @@ describe("Slot Handler", function() {
         expect(err).to.not.be.errorLike
 
         res.should.have.attr('got-username', 'myUsername');
+    });
+
+    itWithJson(noSlotJson, "doesn't barf when no slots", function(err, res) {
+        expect(err).to.not.be.errorLike
+
+        res.should.tell('NoSlot');
     });
 });
